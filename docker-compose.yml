@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  thunderbot:
+    build: .
+    container_name: thunderbot-whatsapp
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - TZ=America/Mexico_City
+      - SESSION_ID=default
+    volumes:
+      - ./session:/app/session
+      - ./data:/app/data
+      - ./logs:/app/logs
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    stdin_open: true
+    tty: true

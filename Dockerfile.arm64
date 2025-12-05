@@ -1,0 +1,50 @@
+FROM node:22-alpine
+
+# Instala dependencias del sistema incluyendo las necesarias para sharp
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    ffmpeg \
+    imagemagick \
+    bash \
+    curl \
+    tzdata \
+    libc6-compat \
+    vips-dev \
+    vips \
+    glib-dev \
+    # Dependencias para sharp
+    cairo-dev \
+    pango-dev \
+    librsvg-dev \
+    giflib-dev \
+    libjpeg-turbo-dev \
+    libpng-dev \
+    libwebp-dev \
+    tiff-dev \
+    # Herramientas de compilación
+    autoconf \
+    automake \
+    libtool \
+    nasm
+
+WORKDIR /app
+
+# Copia archivos de dependencias
+COPY package*.json ./
+
+# Instala dependencias SIN --ignore-scripts para que sharp se compile
+RUN npm config set legacy-peer-deps true && \
+    npm install --omit=dev --foreground-scripts
+
+# Copia código fuente
+COPY . .
+
+# Crea directorios necesarios
+RUN mkdir -p session data temp logs
+
+# Configura zona horaria
+ENV TZ=America/Mexico_City
+
+CMD ["node", "index.js"]
